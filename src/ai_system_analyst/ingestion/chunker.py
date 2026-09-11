@@ -27,6 +27,7 @@ def chunk_document(
             Chunk(
                 chunk_id=f"{document.document_id}-{position:04d}",
                 document_id=document.document_id,
+                source_type=document.source_type,
                 content=content,
                 position=position,
             )

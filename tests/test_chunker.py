@@ -20,6 +20,7 @@ def test_document_is_split_into_overlapping_chunks() -> None:
 
     assert len(chunks) == 4
     assert chunks[0].chunk_id == "DOC-001-0000"
+    assert chunks[0].source_type == SourceType.DOCUMENTATION
     assert chunks[0].content == "ABCDEFGHIJ"
     assert chunks[1].content == "IJKLMNOPQR"
     assert chunks[2].content == "QRSTUVWXYZ"

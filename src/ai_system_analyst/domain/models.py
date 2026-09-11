@@ -22,5 +22,6 @@ class Document:
 class Chunk:
     chunk_id: str
     document_id: str
+    source_type: SourceType
     content: str
     position: int

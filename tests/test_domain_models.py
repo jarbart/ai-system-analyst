@@ -17,10 +17,12 @@ def test_chunk_can_be_created() -> None:
     chunk = Chunk(
         chunk_id="INC-001-0001",
         document_id="INC-001",
+        source_type=SourceType.INCIDENT,
         content="Orders started failing after deployment 2.4.",
         position=0,
     )
 
     assert chunk.chunk_id == "INC-001-0001"
     assert chunk.document_id == "INC-001"
+    assert chunk.source_type == SourceType.INCIDENT
     assert chunk.position == 0
