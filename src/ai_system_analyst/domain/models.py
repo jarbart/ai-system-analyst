@@ -16,3 +16,11 @@ class Document:
     title: str
     source_type: SourceType
     content: str
+
+
+@dataclass(frozen=True)
+class Chunk:
+    chunk_id: str
+    document_id: str
+    content: str
+    position: int
