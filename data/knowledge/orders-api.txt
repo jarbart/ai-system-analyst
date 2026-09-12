@@ -1,0 +1,31 @@
+Orders API
+
+The Orders API is responsible for creating and retrieving customer orders.
+
+POST /api/orders
+
+Creates a new order.
+
+Expected behavior:
+- Returns HTTP 201 when the order is created successfully.
+- Validates customer_id and order_items before processing.
+- Stores the order in PostgreSQL.
+- Publishes an OrderCreated event after successful persistence.
+
+GET /api/orders/{order_id}
+
+Returns a single order.
+
+Expected behavior:
+- Returns HTTP 200 when the order exists.
+- Returns HTTP 404 when the order does not exist.
+- Returns HTTP 500 when an unexpected server-side error occurs.
+
+Known dependencies:
+- PostgreSQL database
+- Order service
+- Event broker
+
+Database timeout configuration:
+- connection_timeout: 5 seconds
+- query_timeout: 10 seconds

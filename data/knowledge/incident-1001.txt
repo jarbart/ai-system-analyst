@@ -1,0 +1,32 @@
+Incident 1001 - Orders API HTTP 500
+
+Incident date: 2026-09-10
+
+The Orders API started returning HTTP 500 responses for GET /api/orders/{order_id}.
+
+Observed behavior:
+- Requests to GET /api/orders/{order_id} fail intermittently.
+- The failure affects requests that require a database lookup.
+- The application logs show database connection timeout errors.
+- The issue started after increased traffic to the Orders service.
+
+Relevant log excerpt:
+ERROR OrdersRepository - database connection timeout after 5 seconds
+ERROR OrderService - failed to retrieve order
+ERROR API - unexpected server-side error
+
+Initial investigation:
+- PostgreSQL is running.
+- No application deployment occurred immediately before the incident.
+- Database CPU usage is elevated.
+- The number of active database connections is close to the configured connection limit.
+
+Current hypothesis:
+The Orders service may be exhausting the available PostgreSQL connections under increased traffic. Requests that cannot obtain a database connection eventually fail with a connection timeout and return HTTP 500.
+
+Recommended investigation:
+- Check the PostgreSQL connection limit.
+- Check the number of active connections.
+- Review Orders service connection pool configuration.
+- Check whether connections are being released correctly.
+- Compare database connection usage before and during the incident.

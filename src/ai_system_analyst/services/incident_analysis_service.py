@@ -1,8 +1,22 @@
+from dataclasses import dataclass
+
+from ai_system_analyst.domain.models import Chunk
 from ai_system_analyst.llm.provider import LLMProvider
 from ai_system_analyst.retrieval.hybrid_search import HybridSearch
 from ai_system_analyst.retrieval.reranker import Reranker
 from ai_system_analyst.services.context_assembler import ContextAssembler
 
+
+@dataclass(frozen=True)
+class Evidence:
+    chunk: Chunk
+    score: float
+
+
+@dataclass(frozen=True)
+class IncidentAnalysisResult:
+    analysis: str
+    evidence: list[Evidence]
 
 class IncidentAnalysisService:
     def __init__(
@@ -22,7 +36,7 @@ class IncidentAnalysisService:
         query: str,
         top_k: int = 5,
         max_context_chars: int = 4000,
-    ) -> str:
+    ) -> IncidentAnalysisResult:
         retrieved = self._hybrid_search.search(
             query,
             top_k=top_k,
@@ -51,4 +65,15 @@ class IncidentAnalysisService:
             "3. Recommended next steps\n"
         )
 
-        return self._llm_provider.generate(prompt)
+        analysis = self._llm_provider.generate(prompt)
+
+        return IncidentAnalysisResult(
+            analysis=analysis,
+            evidence=[
+                Evidence(
+                    chunk=result.chunk,
+                    score=result.score,
+                )
+                for result in reranked
+            ],
+        )

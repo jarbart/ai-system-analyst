@@ -72,7 +72,9 @@ def test_incident_analysis_service_builds_prompt_and_calls_llm() -> None:
         top_k=1,
     )
 
-    assert result == "Fake incident analysis"
+    assert result.analysis == "Fake incident analysis"
+    assert len(result.evidence) == 1
+    assert result.evidence[0].chunk.chunk_id == "orders-0001"
     assert "Orders API returns HTTP 500" in llm_provider.last_prompt
     assert "PostgreSQL is unavailable" in llm_provider.last_prompt
     assert "Likely root cause" in llm_provider.last_prompt
