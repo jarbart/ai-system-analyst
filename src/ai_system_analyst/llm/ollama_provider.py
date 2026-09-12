@@ -20,7 +20,7 @@ class OllamaProvider(LLMProvider):
                 "model": self._model,
                 "prompt": prompt,
                 "stream": False,
-                "format": "json",
+                "format": IncidentAnalysis.model_json_schema(),
             }
         ).encode("utf-8")
 

@@ -19,20 +19,45 @@ if st.button("Analyze"):
         st.warning("Please describe the incident before running the analysis.")
         st.stop()
 
-    response = requests.post(
-        "http://127.0.0.1:8000/analyze",
-        json={"query": query},
-        timeout=120,
-    )
+    with st.spinner("Analyzing incident..."):
+        response = requests.post(
+            "http://127.0.0.1:8000/analyze",
+            json={"query": query},
+            timeout=120,
+        )
 
     response.raise_for_status()
 
     data = response.json()
 
-    st.subheader("Analysis")
-    st.write(data["analysis"])
+    st.subheader("Root cause")
+    st.write(data["root_cause"])
 
-    st.subheader("Evidence")
+    st.subheader("Confirmed evidence")
+
+    if data["confirmed_evidence"]:
+        for item in data["confirmed_evidence"]:
+            st.write(f"- {item}")
+    else:
+        st.info("No confirmed evidence was identified.")
+
+    st.subheader("Hypotheses")
+
+    if data["hypotheses"]:
+        for item in data["hypotheses"]:
+            st.write(f"- {item}")
+    else:
+        st.info("No hypotheses were identified.")
+
+    st.subheader("Next steps")
+
+    if data["next_steps"]:
+        for item in data["next_steps"]:
+            st.write(f"- {item}")
+    else:
+        st.info("No next steps were identified.")
+
+    st.subheader("Retrieved evidence")
 
     for evidence in data["evidence"]:
         with st.expander(
