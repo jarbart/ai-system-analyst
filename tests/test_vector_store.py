@@ -52,3 +52,38 @@ def test_vector_store_returns_empty_for_empty_store() -> None:
     store = VectorStore(dimension=3)
 
     assert store.search([1.0, 0.0, 0.0]) == []
+
+
+def test_vector_store_can_filter_by_source_type() -> None:
+    store = VectorStore(dimension=3)
+
+    store.add(
+        Chunk(
+            chunk_id="docs-1",
+            document_id="DOC-001",
+            source_type=SourceType.DOCUMENTATION,
+            content="Orders API documentation",
+            position=0,
+        ),
+        [1.0, 0.0, 0.0],
+    )
+
+    store.add(
+        Chunk(
+            chunk_id="incident-1",
+            document_id="INC-001",
+            source_type=SourceType.INCIDENT,
+            content="Orders API incident",
+            position=0,
+        ),
+        [0.9, 0.1, 0.0],
+    )
+
+    results = store.search(
+        [1.0, 0.0, 0.0],
+        top_k=5,
+        source_type=SourceType.INCIDENT,
+    )
+
+    assert len(results) == 1
+    assert results[0].chunk.chunk_id == "incident-1"

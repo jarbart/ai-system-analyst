@@ -3,7 +3,7 @@ from dataclasses import dataclass
 import faiss
 import numpy as np
 
-from ai_system_analyst.domain.models import Chunk
+from ai_system_analyst.domain.models import Chunk, SourceType
 
 
 @dataclass(frozen=True)
@@ -33,6 +33,7 @@ class VectorStore:
         self,
         embedding: list[float],
         top_k: int = 5,
+        source_type: SourceType | None = None,
     ) -> list[SearchResult]:
         if top_k <= 0:
             raise ValueError("top_k must be greater than 0")
@@ -47,14 +48,28 @@ class VectorStore:
 
         scores, indices = self._index.search(
             vector,
-            min(top_k, len(self._chunks)),
+            len(self._chunks),
         )
 
-        return [
-            SearchResult(
-                chunk=self._chunks[index],
-                score=float(score),
+        results: list[SearchResult] = []
+
+        for score, index in zip(scores[0], indices[0]):
+            if index < 0:
+                continue
+
+            chunk = self._chunks[index]
+
+            if source_type is not None and chunk.source_type != source_type:
+                continue
+
+            results.append(
+                SearchResult(
+                    chunk=chunk,
+                    score=float(score),
+                )
             )
-            for score, index in zip(scores[0], indices[0])
-            if index >= 0
-        ]
+
+            if len(results) >= top_k:
+                break
+
+        return results

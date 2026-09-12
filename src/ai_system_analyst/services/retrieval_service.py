@@ -1,4 +1,4 @@
-from ai_system_analyst.domain.models import Chunk
+from ai_system_analyst.domain.models import Chunk, SourceType
 from ai_system_analyst.retrieval.embeddings import EmbeddingProvider
 from ai_system_analyst.retrieval.vector_store import SearchResult, VectorStore
 
@@ -20,10 +20,12 @@ class RetrievalService:
         self,
         query: str,
         top_k: int = 5,
+        source_type: SourceType | None = None,
     ) -> list[SearchResult]:
         embedding = self._embedding_provider.embed(query)
 
         return self._vector_store.search(
             embedding,
             top_k=top_k,
+            source_type=source_type,
         )
