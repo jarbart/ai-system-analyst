@@ -22,7 +22,10 @@ class EvidenceResponse(BaseModel):
 
 
 class AnalyzeResponse(BaseModel):
-    analysis: str
+    root_cause: str
+    confirmed_evidence: list[str]
+    hypotheses: list[str]
+    next_steps: list[str]
     evidence: list[EvidenceResponse]
 
 
@@ -45,7 +48,10 @@ def analyze(
     result = service.analyze(request.query)
 
     return AnalyzeResponse(
-        analysis=result.analysis,
+        root_cause=result.root_cause,
+        confirmed_evidence=result.confirmed_evidence,
+        hypotheses=result.hypotheses,
+        next_steps=result.next_steps,
         evidence=[
             EvidenceResponse(
                 document_id=evidence.chunk.document_id,

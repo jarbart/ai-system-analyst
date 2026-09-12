@@ -1,6 +1,7 @@
 import json
 from urllib.request import Request, urlopen
 
+from ai_system_analyst.llm.models import IncidentAnalysis
 from ai_system_analyst.llm.provider import LLMProvider
 
 
@@ -13,12 +14,13 @@ class OllamaProvider(LLMProvider):
         self._model = model
         self._base_url = base_url.rstrip("/")
 
-    def generate(self, prompt: str) -> str:
+    def generate(self, prompt: str) -> IncidentAnalysis:
         payload = json.dumps(
             {
                 "model": self._model,
                 "prompt": prompt,
                 "stream": False,
+                "format": "json",
             }
         ).encode("utf-8")
 
@@ -32,4 +34,4 @@ class OllamaProvider(LLMProvider):
         with urlopen(request, timeout=120) as response:
             data = json.loads(response.read().decode("utf-8"))
 
-        return str(data["response"])
+        return IncidentAnalysis.model_validate_json(data["response"])

@@ -1,4 +1,5 @@
 from ai_system_analyst.domain.models import Chunk, SourceType
+from ai_system_analyst.llm.models import IncidentAnalysis
 from ai_system_analyst.llm.provider import LLMProvider
 from ai_system_analyst.retrieval.embeddings import EmbeddingProvider
 from ai_system_analyst.retrieval.hybrid_search import HybridSearch, HybridSearchResult
@@ -30,9 +31,15 @@ class FakeLLMProvider(LLMProvider):
     def __init__(self) -> None:
         self.last_prompt = ""
 
-    def generate(self, prompt: str) -> str:
+    def generate(self, prompt: str) -> IncidentAnalysis:
         self.last_prompt = prompt
-        return "Fake incident analysis"
+
+        return IncidentAnalysis(
+            root_cause="Fake incident analysis",
+            confirmed_evidence=[],
+            hypotheses=[],
+            next_steps=[],
+        )
 
 
 def make_chunk() -> Chunk:
@@ -72,10 +79,11 @@ def test_incident_analysis_service_builds_prompt_and_calls_llm() -> None:
         top_k=1,
     )
 
-    assert result.analysis == "Fake incident analysis"
     assert len(result.evidence) == 1
     assert result.evidence[0].chunk.chunk_id == "orders-0001"
     assert "Orders API returns HTTP 500" in llm_provider.last_prompt
     assert "PostgreSQL is unavailable" in llm_provider.last_prompt
-    assert "Likely root cause" in llm_provider.last_prompt
-    assert "Recommended next steps" in llm_provider.last_prompt
+    assert '"root_cause": "string"' in llm_provider.last_prompt
+    assert '"confirmed_evidence": ["string"]' in llm_provider.last_prompt
+    assert '"hypotheses": ["string"]' in llm_provider.last_prompt
+    assert '"next_steps": ["string"]' in llm_provider.last_prompt

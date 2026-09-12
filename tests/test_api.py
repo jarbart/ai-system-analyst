@@ -19,7 +19,10 @@ class FakeAnalysisService:
         )
 
         return IncidentAnalysisResult(
-            analysis=f"Analysis requested for: {query}",
+            root_cause=f"Analysis requested for: {query}",
+            confirmed_evidence=["Test evidence"],
+            hypotheses=["Test hypothesis"],
+            next_steps=["Test next step"],
             evidence=[
                 Evidence(
                     chunk=chunk,
@@ -43,7 +46,10 @@ def test_analyze_endpoint_returns_analysis() -> None:
 
     assert response.status_code == 200
     assert response.json() == {
-        "analysis": "Analysis requested for: Orders API returns HTTP 500",
+        "root_cause": "Analysis requested for: Orders API returns HTTP 500",
+        "confirmed_evidence": ["Test evidence"],
+        "hypotheses": ["Test hypothesis"],
+        "next_steps": ["Test next step"],
         "evidence": [
             {
                 "document_id": "test-document",
